@@ -325,10 +325,12 @@ class pFedC(Server):
             
             #-----------update learnable mask----------------------------------------------------------
             logging.info("-------------updating local masks-------------")
-            # if glob_iter != 0:
-            #     self.update_masks()
-            self.update_masks()
+            if glob_iter != 0:
+                self.update_masks()
+            #self.update_masks()
+            print('before gumbel_softmax:  & after update masks:  ',"glob_iter:",glob_iter,"  input_P:",input_P,"  output_Y:",output_Y)      
             self.my_gumbel_softmax()
+            print('after gumbel_softmax & before update masks:  ',"glob_iter:",glob_iter,"  input_P:",input_P,"  output_Y:",output_Y)  
             #--------------------------------------------------------------------------------
 
             logging.info("-------------Aggregating local models-------------")
