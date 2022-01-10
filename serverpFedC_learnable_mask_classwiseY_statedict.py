@@ -337,22 +337,29 @@ class pFedC(Server):
                     elif id > 0 and self.output_Y[id-1][mu_index] == 1: #client 自身有此类label
                         flag_list = list(dict(mu.personalized_model[id-1].named_parameters()).keys())
 
-                        if mu_index == 0:
+                        if mu_index == 0 and mw_index == 2 and id == 2:
                             print("client 0 id ",id," = 1")
                             print("len(param): ",len(param))
                         if self.output_Y[id-1][mw_index] == 0: #轮询的client没有此类label，跳过
                             for j in range(len(param)): 
                                 param[j].data += self.output_Y[id-1][mw_index] * local_param[j].data.clone() * (mw.train_samples / total_train) 
                             for j, layer_name in enumerate(flag_list):
+                                self.personalized_state_dicts[mu_index][id-1][layer_name].requires_grad_()
                                 self.personalized_state_dicts[mu_index][id-1][layer_name] += self.output_Y[id-1][mw_index] * local_param[j].data.clone() * (mw.train_samples / total_train)                           
                             continue
+                        #--------------------------------------------------------------------------------------------
                         for j in range(len(param)): #轮询的client有此类label，聚合
                             param[j].data += self.output_Y[id-1][mw_index] * local_param[j].data.clone() * (mw.train_samples / total_train)
+                        if mu_index == 0 and mw_index == 2 and id == 2:
+                            print("1: param[0] : ", param[0])
+                            print("before self.personalized_state_dicts[mu_index][id-1][fc1.weight] : ",self.personalized_state_dicts[mu_index][id-1]['layer_name'])
                         for j, layer_name in enumerate(flag_list):
+                            self.personalized_state_dicts[mu_index][id-1][layer_name].requires_grad_()
                             self.personalized_state_dicts[mu_index][id-1][layer_name] += self.output_Y[id-1][mw_index] * local_param[j].data.clone() * (mw.train_samples / total_train)
-
+                        if mu_index == 0 and mw_index == 2 and id == 2:
+                            print("after self.personalized_state_dicts[mu_index][id-1][fc1.weight] : ",self.personalized_state_dicts[mu_index][id-1]['layer_name'])
                     elif id > 0 and self.output_Y[id-1][mu_index] == 0: #client 自身没有此类label，则就使用自身参数
-                        if mu_index == 0:
+                        if mu_index == 0 and mw_index == 2 and id == 2:
                             print("client 0 id ",id," = 0")                        
                         for j in range(len(param)):
                             param[j].data += original_params[id][j].data.clone()
